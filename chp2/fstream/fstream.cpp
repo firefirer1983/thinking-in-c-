@@ -54,9 +54,23 @@ TEST_F(GTest, ReadFileLineByLine_GTest) {
     std::string input;
     std::cin >> input;
   }
+  std::cout << 1e2 << std::endl;
+}
+
+void print_hex(const unsigned char &val) {
+  std::bitset<8> bits = val;
+  std::cout << bits.to_string() << std::endl;
 }
 int main(int argc, char *argv[])
 {
+  std::cout << "hex format of 3.14159" << std::endl;
+  double d_num = atof("3.14159");
+  unsigned char *uc_ptr = reinterpret_cast<unsigned char *>(&d_num);
+  for(int i=sizeof(d_num)-1; i>0; i-=2) {
+    print_hex(*(uc_ptr+i));
+    print_hex(*(uc_ptr+i-1));
+  }
+  std::cout << std::endl;
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

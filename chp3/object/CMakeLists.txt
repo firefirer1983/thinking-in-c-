@@ -3,14 +3,15 @@ set(googleTestDir ../../googletest)
 include_directories(${googleTestDir}/googletest/include)
 
 set(SOURCE
-		fstream.cpp)
+        object.cpp
+)
 
-add_executable(fstream
+add_executable(object
 	${SOURCE}
 )
 
 target_link_libraries(
-		fstream
+		object
 	gtest
 )
 
