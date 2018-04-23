@@ -11,7 +11,7 @@ class GTest : public ::testing::Test {
 protected:
   virtual void SetUp(){
   }
-  
+
   virtual void TearDown(){
   }
 };
@@ -97,10 +97,65 @@ struct Stash {
   unsigned char *data_;
 };
 
+struct Link {
+  unsigned char *data_;
+  Link *next_;
+  Link(void *data) {
+    data_ = new unsigned char[mem_size_];
+    memcpy(data_, data, mem_size_);
+  }
+  ~Link() {
+    delete data_;
+    data_ = nullptr;
+  }
+
+  static void Preset(unsigned size) {
+    mem_size_ = size;
+  }
+  static unsigned mem_size_;
+};
+unsigned Link::mem_size_ = 0;
+
+struct Stack {
+
+  Stack(unsigned mem_size):mem_size_(mem_size), head_(nullptr) {
+    Link::Preset(mem_size_);
+  }
+
+  void Push(void *data) {
+    Link *tmp = head_;
+    Link *node = new Link(data);
+    if(tmp) {
+      head_ = node;
+      node->next_ = tmp;
+    }
+  }
+
+  void *Peek() {
+    if(head_) {
+      return (void*)head_;
+    }
+  }
+
+  void Pop() {
+    if(head_) {
+      Link *tmp = head_;
+      head_ = head_->next_;
+      delete tmp;
+    }
+  }
+
+  unsigned mem_size_;
+  Link *head_;
+};
+
 TEST_F(GTest, Objec_GTest) {
   std::cout << sizeof(A) << std::endl;
   std::cout << sizeof(B) << std::endl;
   std::cout << sizeof(C) << std::endl;
+}
+
+TEST_F(GTest, Stash_GTest) {
 
   Stash stash_int(sizeof(int), 10);
   Stash stash_double(sizeof(double), 10);
@@ -128,6 +183,28 @@ TEST_F(GTest, Objec_GTest) {
 
 }
 
+TEST_F(GTest, Stack_GTest) {
+
+  Stack stack_int(sizeof(int));
+  Stack stack_double(sizeof(double));
+  for(int i=0; i<10; i++) {
+    stack_int.Push((void*)&i);
+  }
+
+  for(double d=0; d<20.0; d+=2.0) {
+    stack_double.Push(&d);
+  }
+
+  for(int i=0; i<10; i++) {
+    int val = *(int*)stack_int.Peek();
+    EXPECT_EQ(val, 9-i);
+  }
+
+  for(int d=0; d<20.0; d+=2.0) {
+    double val = *(double*)stack_double.Peek();
+    EXPECT_EQ(val, 20.0-d);
+  }
+}
 
 int main(int argc, char *argv[])
 {
