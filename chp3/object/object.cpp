@@ -103,6 +103,7 @@ struct Link {
   Link(void *data) {
     data_ = new unsigned char[mem_size_];
     memcpy(data_, data, mem_size_);
+    // std::cout <<"Push :" <<  *(double*)data_ << std::endl;
   }
   ~Link() {
     delete data_;
@@ -126,15 +127,18 @@ struct Stack {
     Link *tmp = head_;
     Link *node = new Link(data);
     if(tmp) {
+      node->next_ = head_;
       head_ = node;
-      node->next_ = tmp;
+    } else {
+      head_ = node;
     }
   }
 
   void *Peek() {
     if(head_) {
-      return (void*)head_;
+      return (void*)(head_->data_);
     }
+    return nullptr;
   }
 
   void Pop() {
@@ -197,12 +201,14 @@ TEST_F(GTest, Stack_GTest) {
 
   for(int i=0; i<10; i++) {
     int val = *(int*)stack_int.Peek();
+    stack_int.Pop();
     EXPECT_EQ(val, 9-i);
   }
 
   for(int d=0; d<20.0; d+=2.0) {
     double val = *(double*)stack_double.Peek();
-    EXPECT_EQ(val, 20.0-d);
+    stack_double.Pop();
+    EXPECT_EQ(val, 18.0-d);
   }
 }
 
